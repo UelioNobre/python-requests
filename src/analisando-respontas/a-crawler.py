@@ -5,5 +5,5 @@ url = "https://books.toscrape.com/"
 response = requests.get(url)
 selector = Selector(response.text)
 
-image = selector.css("div.image_container a").get()
+image = selector.css("div.image_container a::attr(href)").get()
 print(image)
