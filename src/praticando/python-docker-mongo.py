@@ -1,9 +1,33 @@
+import sys
+import re
+
 from pymongo import MongoClient
-
-client = MongoClient()
-db = client.library
+from rich import print
 
 
-books = db.books.find({})
+def find_book(technology):
+    titles = []
+    regex = re.compile(technology, re.IGNORECASE)
 
-print(list(books))
+    with MongoClient() as client:
+        db = client.library
+
+        query = {"categories": {"$regex": regex}}
+        projection = {"title": 1}
+
+        books = db.books.find(query, projection)
+        for cursor in books:
+            titles.append(cursor["title"])
+
+    return titles
+
+
+if __name__ == "__main__":
+    print("Executar esse script")
+    technology = sys.argv[1]
+    books = find_book(technology)
+
+    if len(books) < 1:
+        print(f"Nenhum livro encontrado com essa categoria: {technology}")
+    else:
+        print(books)
